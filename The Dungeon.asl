@@ -71,139 +71,20 @@ update {
 	// Convert the modified bytes into a readable string for use in other actions. The ILLIAC II predates UTF-8 by 30 years, so it uses a different encoding.
 	StringBuilder builder = new StringBuilder(modifiedBytesLength);
 	foreach (byte modifiedByte in modifiedBytes) {
-		// Numbers.
-		if (modifiedByte >= 0x30 && modifiedByte <= 0x39) {
-			builder.Append((char)modifiedByte);
-			continue;
-		}
-		if (modifiedByte >= 0xB0 && modifiedByte <= 0xB9) {
-			builder.Append((char)(modifiedByte - 0x80));
-			continue;
-		}
-
-		// Uppercase letters.
-		if (modifiedByte >= 0x41 && modifiedByte <= 0x5A) {
-			builder.Append((char)modifiedByte);
-			continue;
-		}
-		if (modifiedByte >= 0xC1 && modifiedByte <= 0xDA) {
-			builder.Append((char)(modifiedByte - 0x80));
-			continue;
-		}
-
-		// Lowercase letters.
-		if (modifiedByte >= 0x61 && modifiedByte <= 0x7A) {
-			builder.Append((char)modifiedByte);
-			continue;
-		}
-		if (modifiedByte >= 0xE1 && modifiedByte <= 0xFA) {
-			builder.Append((char)(modifiedByte - 0x80));
-			continue;
-		}
-
-		// Other characters.
+		// Special cases.
 		switch (modifiedByte) {
-			case 0x8D:
-				builder.Append('\n');
-				break;
-			case 0xA0:
-			case 0x20:
-				builder.Append(' ');
-				break;
-			case 0x21:
-				builder.Append('!');
-				break;
-			case 0x22:
-				builder.Append('"');
-				break;
-			case 0xA3:
-				builder.Append('#');
-				break;
-			case 0x24:
-				builder.Append('$');
-				break;
-			case 0xA5:
-				builder.Append('%');
-				break;
-			case 0xA6:
-				builder.Append('&');
-				break;
-			case 0x27:
-				builder.Append('\'');
-				break;
-			case 0x28:
-				builder.Append('(');
-				break;
-			case 0xA9:
-				builder.Append(')');
-				break;
-			case 0xAA:
-				builder.Append('*');
-				break;
-			case 0x2B:
-				builder.Append('+');
-				break;
-			case 0xAC:
-				builder.Append(',');
-				break;
-			case 0x2D:
-				builder.Append('-');
-				break;
-			case 0x2E:
-				builder.Append('.');
-				break;
-			case 0xAF:
-				builder.Append('/');
-				break;
-			case 0x60:
+			case 0x60: // Grave in UTF-8, zero in TUTOR.
 				builder.Append('0');
-				break;
-			case 0x3A:
-				builder.Append(':');
-				break;
-			case 0xBB:
-				builder.Append(';');
-				break;
-			case 0x3C:
-				builder.Append('<');
-				break;
-			case 0xBD:
-				builder.Append('=');
-				break;
-			case 0xBE:
-				builder.Append('>');
-				break;
-			case 0x3F:
-				builder.Append('?');
-				break;
-			case 0xC0:
-				builder.Append('@');
-				break;
-			case 0xDB:
-				builder.Append('[');
-				break;
-			case 0x5C:
-				builder.Append('\\');
-				break;
-			case 0xDD:
-				builder.Append(']');
-				break;
-			case 0x5F:
-				builder.Append('_');
-				break;
-			case 0x7B:
-				builder.Append('{');
-				break;
-			case 0xCA:
-				builder.Append('|');
-				break;
-			case 0x7D:
-				builder.Append('}');
-				break;
-			default:
-				builder.Append("(" + modifiedByte.ToString("X") + ")");
-				break;
+				continue;
 		}
+
+		// Approximately convert to UTF-8.
+		char modifiedChar = modifiedByte < 0x80
+			? (char)modifiedByte
+			: (char)(modifiedByte - 0x80);
+
+		// Add to string.
+		builder.Append(modifiedChar);
 	}
 
 	// Log the debug information.
