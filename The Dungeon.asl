@@ -46,7 +46,7 @@ update {
 	bool loopOccurred = lastModifiedIndex < firstModifiedIndex;
 
 	// Determine the size of the modified portion.
-	ushort memoryLength = 4096;
+	ushort memoryLength = 0x1000;
 	ushort firstSegmentLength = (ushort)(memoryLength - firstModifiedIndex);
 	ushort modifiedBytesLength = loopOccurred
 		? (ushort)(firstSegmentLength + lastModifiedIndex)
